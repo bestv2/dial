@@ -1,0 +1,4 @@
+enum CallType {
+  CallIn,
+  CallOut,
+}

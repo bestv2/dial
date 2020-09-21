@@ -1,0 +1,49 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_phone_state (0.0.1):
+    - Flutter
+  - FMDB (2.7.5):
+    - FMDB/standard (= 2.7.5)
+  - FMDB/standard (2.7.5)
+  - "permission_handler (5.0.1+1)":
+    - Flutter
+  - sqflite (0.0.1):
+    - Flutter
+    - FMDB (~> 2.7.2)
+  - url_launcher (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_phone_state (from `.symlinks/plugins/flutter_phone_state/ios`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
+  - sqflite (from `.symlinks/plugins/sqflite/ios`)
+  - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - FMDB
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_phone_state:
+    :path: ".symlinks/plugins/flutter_phone_state/ios"
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
+  sqflite:
+    :path: ".symlinks/plugins/sqflite/ios"
+  url_launcher:
+    :path: ".symlinks/plugins/url_launcher/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_phone_state: ebb27962d725cbe0bdf498654c2a9083acf91b75
+  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
+  sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
+  url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.7.4

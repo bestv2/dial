@@ -33,14 +33,7 @@
 |其他| x|
 
 ## 预览
-![](https://raw.githubusercontent.com/bestv2/flutter_dial/master/screenshot/1.png)
-![](https://raw.githubusercontent.com/bestv2/flutter_dial/master/screenshot/2.png)
-![](https://raw.githubusercontent.com/bestv2/flutter_dial/master/screenshot/3.png)
-![](https://raw.githubusercontent.com/bestv2/flutter_dial/master/screenshot/4.png)
-![](https://raw.githubusercontent.com/bestv2/flutter_dial/master/screenshot/5.png)
-![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/1.png)
-![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/2.png)
-![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/3.png)
-![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/.png)
-![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/5.png)
+![](https://raw.githubusercontent.com/bestv2/flutter_dial/master/screenshot/in_one.png)
+![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/in_one.png)
+
 

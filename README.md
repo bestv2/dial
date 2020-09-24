@@ -32,8 +32,13 @@
 |android| x|
 |其他| x|
 
+## ToDoList
+- [ ] 新增/编辑联系人，目前只有页面没有功能
+- [ ] ui优化
+
 ## 预览
-![](https://raw.githubusercontent.com/bestv2/flutter_dial/master/screenshot/in_one.png)
-![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/in_one.png)
+![](https://raw.githubusercontent.com/bestv2/flutter_dial/master/screenshot/in_one.png)  
+  
+![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/in_one.png)  
 
 

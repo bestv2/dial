@@ -575,7 +575,7 @@ class _DialItemListState extends State<DialItemList> {
                                   Navigator.pop(context);
                                   // print(jsonEncode(dialItem.contact));
                                   Application.router.navigateTo(context,
-                                      "/contact?phoneNumber=$phoneNumber${dialItem.isSaved() ? "&id=${dialItem.contact.id}" : ""}");
+                                      "/contact?phoneNumber=$phoneNumber${dialItem.isSaved() ? "&contact=${jsonEncode(dialItem.contact)}" : ""}");
                                 },
                                 // isDefaultAction: true,
                               ),

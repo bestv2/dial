@@ -53,7 +53,7 @@ class ContactsPage extends StatelessWidget {
   }
 
   Widget _buildListItem(
-      SuspensionContact model, BuildContext context, HomeModel homeModel) {
+      SuspensionContact model, BuildContext context, HomeModel homeModel, int index) {
     String susTag = model.getSuspensionTag();
     return Column(
       children: <Widget>[
@@ -125,24 +125,29 @@ class ContactsPage extends StatelessWidget {
               .toList();
           _contacts.sort((left, right) => left.getSuspensionTag() == '#'
               ? 1
-              : left.getSuspensionTag().compareTo(right.getSuspensionTag()));
+              : (right.getSuspensionTag() == '#'
+                  ? -1
+                  : left
+                      .getSuspensionTag()
+                      .compareTo(right.getSuspensionTag())));
           // _contacts.sort((left, right) =>
           //     left?.dialItem?.name.compareTo(right?.dialItem?.name));
+          print(_contacts.length);
           return AzListView(
             data: _contacts,
             itemCount: _contacts.length,
             itemBuilder: (BuildContext context, int i) {
-              if (i.isOdd) {
-                return Divider(
-                  height: 1,
-                );
-              }
-              final index = i ~/ 2;
-              if (index >= _contacts.length) {
-                return null;
-              }
-              SuspensionContact model = _contacts[index];
-              return _buildListItem(model, context, homeModel);
+              // if (i.isOdd) {
+              //   return Divider(
+              //     height: 1,
+              //   );
+              // }
+              // final index = i ~/ 2;
+              // if (index >= _contacts.length) {
+              //   return null;
+              // }
+              SuspensionContact model = _contacts[i];
+              return _buildListItem(model, context, homeModel, i);
             },
             physics: BouncingScrollPhysics(),
             indexBarData: SuspensionUtil.getTagIndexList(_contacts),

@@ -53,7 +53,8 @@ class Contact {
        'phoneNumbers': jsonEncode(phoneNumbers),
     };
   }
-  Map toJSON() {
+  Map toJson() {
+    print('contact to json');
     return toMap();
   }
 }

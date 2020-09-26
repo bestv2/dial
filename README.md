@@ -37,8 +37,8 @@
 - [ ] ui优化
 
 ## 预览
-![](https://gitee.com/bestv2/flutter_dialer/raw/5e898566b5f2baaa2f004dc9e932ead12a843ae5/screenshot/in_one.png)  
+![](https://gitee.com/bestv2/flutter_dialer/raw/master/screenshot/in_one.png)  
   
-![](https://gitee.com/bestv2/flutter_dial/raw/master/screenshot/in_one.png)  
+![](https://raw.githubusercontent.com/bestv2/flutter_dialer/master/screenshot/in_one.png)  
 
 

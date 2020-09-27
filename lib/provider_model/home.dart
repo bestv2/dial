@@ -36,49 +36,51 @@ class HomeModel with ChangeNotifier {
     dialItems.insert(0, item);
     return item;
   }
+
   loadTestData() {
     // dialItems.add(DialItem.fromJson({"name": "秋丽飞", "phoneNumber": "13312341234"}));
-      // dialItems.add(DialItem.fromJson({"name": "李茹菲", "phoneNumber": "13588994455"}));
-      // dialItems.add(DialItem.fromJson({"name": "妈", "phoneNumber": "18896565456"}));
-      // dialItems.add(DialItem.fromJson({"name": "姐姐", "phoneNumber": "16677221133"}));
-      // dialItems.add(DialItem.fromJson({"name": "李崖城", "phoneNumber": "15566451245"}));
+    // dialItems.add(DialItem.fromJson({"name": "李茹菲", "phoneNumber": "13588994455"}));
+    // dialItems.add(DialItem.fromJson({"name": "妈", "phoneNumber": "18896565456"}));
+    // dialItems.add(DialItem.fromJson({"name": "姐姐", "phoneNumber": "16677221133"}));
+    // dialItems.add(DialItem.fromJson({"name": "李崖城", "phoneNumber": "15566451245"}));
 
-      // dialItems.add(DialItem.fromContact(Contact.fromJson({
-      //   "firstName": "丽飞",
-      //   "lastName": "秋",
-      //   "phoneNumbers": [
-      //     {"value": "13312341234", "label": ""}
-      //   ]
-      // })));
-      // dialItems.add(DialItem.fromContact(Contact.fromJson({
-      //   "firstName": "爸爸",
-      //   "lastName": "秋",
-      //   "phoneNumbers": [
-      //     {"value": "13232341234", "label": ""}
-      //   ]
-      // })));
-      // dialItems.add(DialItem.fromContact(Contact.fromJson({
-      //   "firstName": "妈",
-      //   "lastName": "",
-      //   "phoneNumbers": [
-      //     {"value": "18896565456", "label": ""}
-      //   ]
-      // })));
-      // dialItems.add(DialItem.fromContact(Contact.fromJson({
-      //   "firstName": "姐",
-      //   "lastName": "姐姐",
-      //   "phoneNumbers": [
-      //     {"value": "16677221133", "label": ""}
-      //   ]
-      // })));
-      // dialItems.add(DialItem.fromContact(Contact.fromJson({
-      //   "firstName": "崖城",
-      //   "lastName": "李",
-      //   "phoneNumbers": [
-      //     {"value": "13312341234", "label": ""}
-      //   ]
-      // })));
+    // dialItems.add(DialItem.fromContact(Contact.fromJson({
+    //   "firstName": "丽飞",
+    //   "lastName": "秋",
+    //   "phoneNumbers": [
+    //     {"value": "13312341234", "label": ""}
+    //   ]
+    // })));
+    // dialItems.add(DialItem.fromContact(Contact.fromJson({
+    //   "firstName": "爸爸",
+    //   "lastName": "秋",
+    //   "phoneNumbers": [
+    //     {"value": "13232341234", "label": ""}
+    //   ]
+    // })));
+    // dialItems.add(DialItem.fromContact(Contact.fromJson({
+    //   "firstName": "妈",
+    //   "lastName": "",
+    //   "phoneNumbers": [
+    //     {"value": "18896565456", "label": ""}
+    //   ]
+    // })));
+    // dialItems.add(DialItem.fromContact(Contact.fromJson({
+    //   "firstName": "姐",
+    //   "lastName": "姐姐",
+    //   "phoneNumbers": [
+    //     {"value": "16677221133", "label": ""}
+    //   ]
+    // })));
+    // dialItems.add(DialItem.fromContact(Contact.fromJson({
+    //   "firstName": "姑妈",
+    //   "lastName": "源心",
+    //   "phoneNumbers": [
+    //     {"value": "13312341234", "label": ""}
+    //   ]
+    // })));
   }
+
   /// 获取通讯录列表
   ///
   /// return list[Contact]。
@@ -90,7 +92,7 @@ class HomeModel with ChangeNotifier {
         DialItem dialItem = DialItem.fromContact(contact);
         dialItems.add(dialItem);
       });
-      // loadTestData();
+      loadTestData();
       dialItems.sort((left, right) => compareDialItem(left, right));
     }
     HistoryProvider provider = HistoryProvider();

@@ -103,7 +103,9 @@ class DialItem {
     int nameIndex = 0;
     int letterIndex = 0;
     int lastNameIndex = -1, lastLetterIndex = -1;
-    // 相邻算法
+    bool first = false; // 匹配首字母
+
+    // 相邻规则
     // numbers游标递进不相邻算法
     for (; numberIndex < numbers.length; numberIndex++) {
       String number = numbers[numberIndex];
@@ -122,13 +124,20 @@ class DialItem {
             // 每次命中基础增加10分， 同单词同时命中 - 0， 夸词汇 - d,如果跨的是首字 - d / 2
             score += 10 +
                 (lastNameIndex - nameIndex) * (lastNameIndex == -1 ? .5 : 1);
+            // 首字母模式直接跳到下个单
+            if (nameHited.length == 2 &&
+                lastLetterIndex == 0 &&
+                letterIndex == 0) {
+              first = true;
+            }
             lastNameIndex = nameIndex;
             lastLetterIndex = letterIndex;
             numberFound = true;
           }
         }
         // jump
-        if (letterIndex < name.length - 1 && numberFound) {
+        // 首字母模式直接跳到下个单词
+        if (letterIndex < name.length - 1 && numberFound && !first) {
           letterIndex++;
         } else {
           if (combo && nameHited.isNotEmpty && nameHited.last != nameIndex) {

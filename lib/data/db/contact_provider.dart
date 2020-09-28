@@ -43,8 +43,8 @@ class ContactProvider extends DbProvider {
           // existContact["bg"] == null ||
           existContact["phoneNumbers"] != jsonEncode(contact.phoneNumbers)) {
         // print('save update: ${contact.firstName}');
-        contact.firstName = existContact["firstName"];
-        contact.lastName = existContact["lastName"];
+        contact.firstName = existContact["firstName"].toString();
+        contact.lastName = existContact["lastName"].toString();
         List numbers = jsonDecode(existContact["phoneNumbers"]);
         contact.phoneNumbers =
             numbers.map((e) => PhoneNumber.fromJSON(e)).toList();

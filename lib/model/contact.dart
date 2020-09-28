@@ -29,8 +29,8 @@ class Contact {
   }
 
   Contact.fromJson(Map json, {bool newColor = false}) {
-    firstName = json["firstName"];
-    lastName = json["lastName"];
+    firstName = json["firstName"].toString();
+    lastName = json["lastName"].toString();
     id = json["identifier"];
     // print(newColor);
     bg = newColor != null && newColor ? AppColor.randomColor().value : json["bg"];

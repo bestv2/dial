@@ -133,8 +133,7 @@ class DialItem {
               nameHited.add(nameIndex);
             }
             // 每次命中基础增加10分， 同单词同时命中 - 0， 夸词汇 - d,如果跨的是首字 - d / 2
-            score += 10 +
-                (lastNameIndex - nameIndex) * (lastNameIndex == -1 ? .5 : 1);
+            score += 10 + (combo ? 2: 1);
             // 首字母模式直接跳到下个单
             if (nameHited.length == 2 &&
                 lastLetterIndex == 0 &&
@@ -154,6 +153,7 @@ class DialItem {
           if (combo && nameHited.isNotEmpty && nameHited.last != nameIndex) {
             nameIndex = nameHited.first + 1;
             nameHited = [];
+            score = 0;
             letterIndex = 0;
             numberIndex = 0;
             first = false;

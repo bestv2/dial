@@ -512,8 +512,8 @@ class _DialItemListState extends State<DialItemList> {
                   }
                   // nameW.add(
                   //   Text(
-                  //     // dialItem.score.toString(),
-                  //     dialItem.time.toString(),
+                  //     dialItem.score.toString(),
+                  //     // dialItem.time.toString(),
                   //       style: TextStyle(
                   //           color: Color(AppColor.mainTextColor),
                   //           fontSize: mainFontSize)),

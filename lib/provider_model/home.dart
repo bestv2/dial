@@ -105,6 +105,7 @@ class HomeModel with ChangeNotifier {
         );
       });
     }
+    // print(contacts);
     notifyListeners();
     return contacts;
   }

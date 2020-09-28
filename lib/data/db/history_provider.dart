@@ -9,11 +9,13 @@ class HistoryProvider extends DbProvider {
     columns = [
       Column(name: 'phoneNumber', type: 'string'),
       Column(name: 'startAt', type: 'datetime'),
+      Column(name: 'bg', type: 'integer'),
     ];
   }
   insert(History history) async {
     Database db = await getDatabase();
     var map = history.toMap();
+    // print(map);
     // map.update(columnId, (value) => DateTime.now().millisecondsSinceEpoch);
     return await db.insert(tableName, map);
   }
@@ -31,7 +33,7 @@ class HistoryProvider extends DbProvider {
     var res = await db.query(
       tableName,
       // distinct: true,
-      columns: ['phoneNumber', 'max(startAt) as startAt'],
+      columns: ['phoneNumber', 'max(startAt) as startAt', 'bg'],
       orderBy: 'max(startAt) desc',
       limit: 100,
       groupBy: 'phoneNumber',

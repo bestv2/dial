@@ -2,6 +2,11 @@ import 'package:dial/data/db/db_manager.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DbProvider {
+  drop() async {
+    Database db = await DbManager.getCurrentDatabase();
+    await db.execute("DROP TABLE IF EXISTS $tableName");
+  }
+
   bool isTabaleExist = false;
   String tableName = 'base';
   String columnId = '_id';
@@ -12,13 +17,16 @@ class DbProvider {
     if (!await DbManager.isTableExists(tableName)) {
       await db.execute(tableCreateSql());
     }
+    // print(tableName);
     // print(dbColumns);
     bool allField = true;
     columns.forEach((column) {
       if (allField)
-        allField = dbColumns.any((dbColumn) => dbColumn['name'] == column.name);
+        allField = dbColumns.any((dbColumn) =>
+            dbColumn['name'] == column.name && dbColumn['type'] == column.type);
     });
     if (!allField) {
+      print('------- warn ------- drop tabel $tableName');
       await db.execute("DROP TABLE IF EXISTS $tableName");
       await db.execute(tableCreateSql());
     }

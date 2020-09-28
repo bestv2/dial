@@ -18,18 +18,16 @@ class HomeModel with ChangeNotifier {
   List<DialItem> dialItems = <DialItem>[];
 
   String dialed = "";
-  DialItem addNumberToList(String phoneNumber, {String startAt}) {
-    var index = dialItems
-        .indexWhere(((dialItem) => dialItem.phoneNumber == phoneNumber));
+  DialItem addHistoryToList(History history) {
+    var index = dialItems.indexWhere(
+        ((dialItem) => dialItem.phoneNumber == history.phoneNumber));
     DialItem item;
     if (index != -1) {
       item = dialItems[index];
       dialItems.removeAt(index);
+      item.time = history.startAt;
     } else {
-      item = DialItem.fromJson({"phoneNumber": phoneNumber});
-    }
-    if (startAt != null && startAt != '') {
-      item.time = DateTime.parse(startAt);
+      item = DialItem.fromHistory(history);
     }
     dialItems.insert(0, item);
     return item;
@@ -87,6 +85,7 @@ class HomeModel with ChangeNotifier {
     if (result != null) {
       result.forEach((Contact contact) {
         contacts.add(contact);
+        // print('contact bg : ${contact.bg}');
         DialItem dialItem = DialItem.fromContact(contact);
         dialItems.add(dialItem);
       });
@@ -97,8 +96,13 @@ class HomeModel with ChangeNotifier {
     var historys = await provider.getData();
     if (histories != null) {
       historys.reversed.forEach((historyJson) {
-        String phoneNumber = historyJson["phoneNumber"].toString();
-        addNumberToList(phoneNumber, startAt: historyJson["startAt"]);
+        History history = History(
+            bg: historyJson['bg'],
+            phoneNumber: historyJson["phoneNumber"].toString(),
+            startAt: DateTime.parse(historyJson["startAt"]));
+        addHistoryToList(
+          history,
+        );
       });
     }
     notifyListeners();
@@ -106,19 +110,20 @@ class HomeModel with ChangeNotifier {
   }
 
   dial(String phoneNumber) async {
-    final phoneCall = FlutterPhoneState.startPhoneCall(phoneNumber);
-    await phoneCall.eventStream.forEach((PhoneCallEvent event) {
-      if (event.status == PhoneCallStatus.connecting) {
-        addHistory(phoneNumber);
-      }
-    });
+    // final phoneCall = FlutterPhoneState.startPhoneCall(phoneNumber);
+    // await phoneCall.eventStream.forEach((PhoneCallEvent event) {
+    //   if (event.status == PhoneCallStatus.connecting) {
+    //     addHistory(phoneNumber);
+    //   }
+    // });
+    addHistory(phoneNumber);
     print("Call is complete");
   }
 
   addHistory(String phoneNumber) {
     DateTime time = DateTime.now();
-    DialItem dialItem = addNumberToList(phoneNumber, startAt: time.toString());
-    History history = History(phoneNumber: dialItem.phoneNumber, startAt: time);
+    History history = History(phoneNumber: phoneNumber, startAt: time);
+    addHistoryToList(history);
     HistoryProvider provider = HistoryProvider();
     provider.insert(history);
     input('reset');

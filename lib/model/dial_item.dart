@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:dial/model/history.dart';
@@ -44,7 +45,16 @@ class DialItem {
   });
 
   void format() {
-    bg = AppColor.randomColor();
+    // bg = AppColor.randomColor();
+    // print(bg);
+    // print(contact);
+    if (bg == null && contact != null && contact.bg != null) {
+      bg = Color(contact.bg);
+    } else if (bg == null) {
+      bg = AppColor.randomColor();
+    }
+    // print(bg);
+    // log('$bg');
     var enReg = RegExp(r"[A-Za-z]");
     var cnReg = RegExp(r"[^\x00-\xff]");
     String firstName = contact?.firstName;
@@ -89,6 +99,7 @@ class DialItem {
     if (shortName == null || shortName.isEmpty) {
       shortName = '-';
     }
+    // print('$name,$bg');
     // print(namePinyinArr);
   }
 
@@ -193,6 +204,10 @@ class DialItem {
         }
       }
     } else {
+      var score1 = rankName(numbers);
+      score1 =
+          score1 > baseRankScore ? score1 : rankName(numbers, combo: false);
+      if (score1 > baseRankScore) return score1;
       var phoneNumbers = contact?.phoneNumbers;
 
       var matched =
@@ -214,16 +229,15 @@ class DialItem {
         return score;
       }
     }
-    var score1 = rankName(numbers);
-    return score1 > baseRankScore ? score1 : rankName(numbers, combo: false);
+    return baseRankScore;
   }
 
-  DialItem.fromJson(Map json) {
-    name = json['name']?.toString() ?? '';
-    phoneNumber = json['phoneNumber'].toString();
-    if (json['startAt'] != null && json['startAt'] != '') {
-      time = DateTime.parse(json['startAt']);
-    }
+  DialItem.fromHistory(History history) {
+    name = '';
+    phoneNumber = history.phoneNumber;
+    time = history.startAt;
+    // print('this.time:${this.time}');
+    if (history.bg != null) bg = Color(history.bg);
     format();
   }
 
@@ -243,8 +257,9 @@ class DialItem {
   int compareTo(DialItem right, {bool withScore = false}) {
     DialItem left = this;
     // 分数降序
-    if (withScore && right.score.compareTo(left.score) != 0)
+    if (withScore!=null && withScore && right.score.compareTo(left.score) != 0)
       return right.score.compareTo(left.score);
+    // print('$phoneNumber,$withScore ,left.time:${left.time}, right.time:${right.time}');
     if (left.time != null && right.time == null) {
       // 有时间的在前
       return -1;

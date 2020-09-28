@@ -236,7 +236,6 @@ class DialPad extends AnimatedWidget {
               tip: '粘贴',
               onLongPress: () async {
                 var text = (await Clipboard.getData(Clipboard.kTextPlain)).text;
-                // print(text);
                 if (text != null && RegExp(r"^\d+$").hasMatch(text)) {
                   homeModel.input(text.toString());
                 }
@@ -512,7 +511,9 @@ class _DialItemListState extends State<DialItemList> {
                     );
                   }
                   // nameW.add(
-                  //   Text(dialItem.score.toString(),
+                  //   Text(
+                  //     // dialItem.score.toString(),
+                  //     dialItem.time.toString(),
                   //       style: TextStyle(
                   //           color: Color(AppColor.mainTextColor),
                   //           fontSize: mainFontSize)),
@@ -573,7 +574,6 @@ class _DialItemListState extends State<DialItemList> {
                                     dialItem.isSaved() ? '编辑联系人' : '创建联系人'),
                                 onPressed: () {
                                   Navigator.pop(context);
-                                  // print(jsonEncode(dialItem.contact));
                                   Application.router.navigateTo(context,
                                       "/contact?phoneNumber=$phoneNumber${dialItem.isSaved() ? "&contact=${jsonEncode(dialItem.contact)}" : ""}");
                                 },

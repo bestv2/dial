@@ -7,15 +7,7 @@ class DataBus {
   static const MethodChannel _channel =
       const MethodChannel('dial.flutter.io/contacts');
 
-  static Contact _toContact(element) {
-    Contact contact = Contact.fromJson(element);
-    ContactProvider cp = ContactProvider();
-    cp.save(contact);
-    return contact;
-  }
-
-  static Future<List<Contact>> getDeviceContacts() async {
-    // print(DateTime.now());
+  static Future<List<Contact>> getDeviceContactsFromDevice({bool first}) async {
     var status = await Permission.contacts.status;
     // print(status);
     if (status.isUndetermined) {
@@ -23,7 +15,32 @@ class DataBus {
     }
     await Permission.contacts.request().isGranted;
     final List result = await _channel.invokeMethod('getContacts');
-    return result.map((element) => _toContact(element)).toList();
+    final List<Contact> contacts = [];
+    ContactProvider cp = ContactProvider();
+    // await cp.drop();
+    result.forEach((element) async {
+      final Contact contact = Contact.fromJson(element, newColor: first);
+      cp.save(contact);
+      contacts.add(contact);
+    });
+    return contacts;
+  }
+
+  static Future<List<Contact>> getDeviceContacts() async {
+    ContactProvider cp = ContactProvider();
+    // await cp.drop();
+    List<Map> result = await cp.getData();
+    // print(result);
+    if (result.isNotEmpty) {
+      var res = result
+          .map((element) => Contact.fromJson(element))
+          .toList();
+      // 第二次加载
+      getDeviceContactsFromDevice();
+      return res;
+    }
+    return getDeviceContactsFromDevice(first: true);
+    // print(DateTime.now());
   }
 }
 

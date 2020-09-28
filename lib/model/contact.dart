@@ -1,7 +1,7 @@
 import 'package:dial/enum/match_type.dart';
+import 'package:dial/utils/style.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'dart:convert' show jsonDecode, jsonEncode;
-
 
 class Contact {
   Contact({firstName, lastName, phoneNumber, id, bg}) {
@@ -14,7 +14,7 @@ class Contact {
   String id;
   String firstName;
   String lastName;
-  String bg;
+  int bg;
 
   List<PhoneNumber> phoneNumbers;
 
@@ -28,20 +28,26 @@ class Contact {
         : defaultNumbers.first;
   }
 
-  Contact.fromJson(Map json) {
+  Contact.fromJson(Map json, {bool newColor = false}) {
     firstName = json["firstName"];
     lastName = json["lastName"];
     id = json["identifier"];
+    // print(newColor);
+    bg = newColor != null && newColor ? AppColor.randomColor().value : json["bg"];
     phoneNumbers = [];
-    for (var phoneNumber in json["phoneNumbers"]) {
+    var phoneNumbersJson = json["phoneNumbers"] is String
+        ? jsonDecode(json["phoneNumbers"])
+        : json["phoneNumbers"];
+    for (var phoneNumber in phoneNumbersJson) {
       phoneNumbers.add(PhoneNumber(
-          number: phoneNumber["value"], type: phoneNumber["label"]));
+          number: phoneNumber["value"] ?? phoneNumber["number"],
+          type: phoneNumber["label"]));
     }
   }
 
   @override
   String toString() {
-    return {firstName, lastName, phoneNumbers, id, bg}.toString();
+    return toMap().toString();
   }
 
   Map<String, dynamic> toMap() {
@@ -50,11 +56,11 @@ class Contact {
       'lastName': lastName,
       'id': id,
       'bg': bg,
-       'phoneNumbers': jsonEncode(phoneNumbers),
+      'phoneNumbers': jsonEncode(phoneNumbers),
     };
   }
+
   Map toJson() {
-    print('contact to json');
     return toMap();
   }
 }
@@ -72,11 +78,13 @@ class PhoneNumber {
     map["type"] = this.type;
     return map;
   }
+
   @override
   String toString() {
     // TODO: implement toString
     return {number, type, isDefault}.toString();
   }
+
   PhoneNumber.fromJSON(Map map) {
     isDefault = map["isDefault"];
     number = map["number"];

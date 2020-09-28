@@ -121,7 +121,7 @@ class ContactsPage extends StatelessWidget {
           _contacts.sort((left, right) => left.dialItem.compareTo(right.dialItem));
           // _contacts.sort((left, right) =>
           //     left?.dialItem?.name.compareTo(right?.dialItem?.name));
-          print(_contacts.length);
+          // print(_contacts.length);
           return AzListView(
             data: _contacts,
             itemCount: _contacts.length,

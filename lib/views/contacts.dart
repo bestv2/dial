@@ -13,12 +13,7 @@ class SuspensionContact extends ISuspensionBean {
   }
   @override
   String getSuspensionTag() {
-    if (dialItem.namePinyinArr.isNotEmpty &&
-        dialItem.namePinyinArr[0].isNotEmpty) {
-      var leteter = dialItem.namePinyinArr[0][0].toString().toUpperCase();
-      return RegExp(r"^[A-Z]$").hasMatch(leteter) ? leteter : '#';
-    }
-    return '#';
+    return dialItem.getSuspensionTag();
   }
 }
 
@@ -123,13 +118,7 @@ class ContactsPage extends StatelessWidget {
           List<SuspensionContact> _contacts = homeModel.contacts
               .map((contact) => SuspensionContact(contact))
               .toList();
-          _contacts.sort((left, right) => left.getSuspensionTag() == '#'
-              ? 1
-              : (right.getSuspensionTag() == '#'
-                  ? -1
-                  : left
-                      .getSuspensionTag()
-                      .compareTo(right.getSuspensionTag())));
+          _contacts.sort((left, right) => left.dialItem.compareTo(right.dialItem));
           // _contacts.sort((left, right) =>
           //     left?.dialItem?.name.compareTo(right?.dialItem?.name));
           print(_contacts.length);

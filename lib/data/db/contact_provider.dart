@@ -14,6 +14,7 @@ class ContactProvider extends DbProvider {
       Column(name: 'firstName', type: 'string'),
       Column(name: 'lastName', type: 'string'),
       Column(name: 'phoneNumbers', type: 'string'),
+      Column(name: 'bg', type: 'string'),
     ];
   }
   save(Contact contact) async {

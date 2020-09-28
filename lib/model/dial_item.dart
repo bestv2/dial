@@ -144,6 +144,8 @@ class DialItem {
             nameIndex = nameHited.first + 1;
             nameHited = [];
             letterIndex = 0;
+            numberIndex = 0;
+            first = false;
             numberFound = false;
           } else {
             nameIndex++;
@@ -229,6 +231,80 @@ class DialItem {
     contact = con;
     format();
   }
+
+  String getSuspensionTag() {
+    if (namePinyinArr.isNotEmpty && namePinyinArr[0].isNotEmpty) {
+      var leteter = namePinyinArr[0][0].toString().toUpperCase();
+      return RegExp(r"^[A-Z]$").hasMatch(leteter) ? leteter : '#';
+    }
+    return '#';
+  }
+
+  int compareTo(DialItem right, {bool withScore = false}) {
+    DialItem left = this;
+    // 分数降序
+    if (withScore && right.score.compareTo(left.score) != 0)
+      return right.score.compareTo(left.score);
+    if (left.time != null && right.time == null) {
+      // 有时间的在前
+      return -1;
+    } else if (left.time == null && right.time != null) {
+      return 1;
+    }
+    if (left.time != null &&
+        right.time != null &&
+        left.time.compareTo(right.time) != 0) {
+      // 时间降序
+      return right.time.compareTo(left.time);
+    }
+    return getSuspensionTag() == '#'
+        ? 1
+        : (right.getSuspensionTag() == '#'
+            ? -1
+            : getSuspensionTag().compareTo(right.getSuspensionTag()));
+  }
+
+  //  compareDialItem(DialItem left, DialItem right, {bool withScore = false}) {
+  //   // 分数降序
+  //   if (withScore && right.score.compareTo(left.score) != 0)
+  //     return right.score.compareTo(left.score);
+  //   if (left.time != null && right.time == null) {
+  //     // 有时间的在前
+  //     return -1;
+  //   } else if (left.time == null && right.time != null) {
+  //     return 1;
+  //   }
+  //   if (left.time != null &&
+  //       right.time != null &&
+  //       left.time.compareTo(right.time) != 0) {
+  //     // 时间降序
+  //     return right.time.compareTo(left.time);
+  //   }
+  //   // 有名字的在前
+  //   if (left.name.isNotEmpty && right.name.isEmpty) {
+  //     return -1;
+  //   } else if (right.name.isNotEmpty && left.name.isEmpty) {
+  //     return 1;
+  //   }
+  //   // 中文在前面
+  //   if (left.name.isNotEmpty &&
+  //       right.name.isNotEmpty &&
+  //       !left.isEn &&
+  //       right.isEn) {
+  //     return -1;
+  //   } else if (left.name.isNotEmpty &&
+  //       right.name.isNotEmpty &&
+  //       left.isEn &&
+  //       !right.isEn) {
+  //     return 1;
+  //   }
+  //   // 姓名升序
+  //   if (left.name.compareTo(right.name) != 0)
+  //     return left.name.compareTo(right.name);
+  //   // 电话升序
+  //   return left.phoneNumber.compareTo(right.phoneNumber);
+  // }
+
   @override
   String toString() {
     return {phoneNumber, name, contact, history}.toString();

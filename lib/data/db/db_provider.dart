@@ -8,7 +8,18 @@ class DbProvider {
   List<Column> columns = [];
   Future<Database> getDatabase() async {
     Database db = await DbManager.getCurrentDatabase();
+    List dbColumns = await DbManager.getColumns(tableName);
     if (!await DbManager.isTableExists(tableName)) {
+      await db.execute(tableCreateSql());
+    }
+    // print(dbColumns);
+    bool allField = true;
+    columns.forEach((column) {
+      if (allField)
+        allField = dbColumns.any((dbColumn) => dbColumn['name'] == column.name);
+    });
+    if (!allField) {
+      await db.execute("DROP TABLE IF EXISTS $tableName");
       await db.execute(tableCreateSql());
     }
     return db;

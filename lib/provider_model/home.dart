@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phone_state/flutter_phone_state.dart';
 import 'dart:async';
 
-import 'package:url_launcher/url_launcher.dart';
-
 class HomeModel with ChangeNotifier {
   HomeModel() {
     // getContacts();
@@ -72,13 +70,13 @@ class HomeModel with ChangeNotifier {
     //     {"value": "16677221133", "label": ""}
     //   ]
     // })));
-    // dialItems.add(DialItem.fromContact(Contact.fromJson({
-    //   "firstName": "姑妈",
-    //   "lastName": "源心",
-    //   "phoneNumbers": [
-    //     {"value": "13312341234", "label": ""}
-    //   ]
-    // })));
+    dialItems.add(DialItem.fromContact(Contact.fromJson({
+      "firstName": "姑妈",
+      "lastName": "源心",
+      "phoneNumbers": [
+        {"value": "13312341234", "label": ""}
+      ]
+    })));
   }
 
   /// 获取通讯录列表
@@ -92,8 +90,8 @@ class HomeModel with ChangeNotifier {
         DialItem dialItem = DialItem.fromContact(contact);
         dialItems.add(dialItem);
       });
-      loadTestData();
-      dialItems.sort((left, right) => compareDialItem(left, right));
+      // loadTestData();
+      dialItems.sort((left, right) => left.compareTo(right));
     }
     HistoryProvider provider = HistoryProvider();
     var historys = await provider.getData();
@@ -137,47 +135,6 @@ class HomeModel with ChangeNotifier {
     notifyListeners();
   }
 
-  compareDialItem(DialItem left, DialItem right, {bool withScore = false}) {
-    // 分数降序
-    if (withScore && right.score.compareTo(left.score) != 0)
-      return right.score.compareTo(left.score);
-    if (left.time != null && right.time == null) {
-      // 有时间的在前
-      return -1;
-    } else if (left.time == null && right.time != null) {
-      return 1;
-    }
-    if (left.time != null &&
-        right.time != null &&
-        left.time.compareTo(right.time) != 0) {
-      // 时间降序
-      return right.time.compareTo(left.time);
-    }
-    // 有名字的在前
-    if (left.name.isNotEmpty && right.name.isEmpty) {
-      return -1;
-    } else if (right.name.isNotEmpty && left.name.isEmpty) {
-      return 1;
-    }
-    // 中文在前面
-    if (left.name.isNotEmpty &&
-        right.name.isNotEmpty &&
-        !left.isEn &&
-        right.isEn) {
-      return -1;
-    } else if (left.name.isNotEmpty &&
-        right.name.isNotEmpty &&
-        left.isEn &&
-        !right.isEn) {
-      return 1;
-    }
-    // 姓名升序
-    if (left.name.compareTo(right.name) != 0)
-      return left.name.compareTo(right.name);
-    // 电话升序
-    return left.phoneNumber.compareTo(right.phoneNumber);
-  }
-
   input(String value) {
     var from = dialed;
     if (value == 'reset') {
@@ -199,10 +156,9 @@ class HomeModel with ChangeNotifier {
       element.rank(dialed);
     });
     if (dialed.isEmpty) {
-      dialItems.sort((left, right) => compareDialItem(left, right));
+      dialItems.sort((left, right) => left.compareTo(right));
     } else {
-      dialItems
-          .sort((left, right) => compareDialItem(left, right, withScore: true));
+      dialItems.sort((left, right) => left.compareTo(right, withScore: true));
     }
     eventBus.fire(DataEventHome(from: from, to: dialed));
     notifyListeners();

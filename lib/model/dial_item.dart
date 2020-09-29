@@ -15,6 +15,7 @@ class Scores {
   static final double comboWord = 3;
   static final double comboLetter = 3;
   static final double baseRank = 0;
+  static final double number = 10;
 }
 
 class DialItem {
@@ -199,11 +200,10 @@ class DialItem {
       // 有通讯录优先匹配名字
       // 首字母模式和非首字母模式
       var headScore = rankName(numbers, headLetter: true);
-      var score = headScore > Scores.baseRank
+      score = headScore > Scores.baseRank
           ? headScore
           : rankName(numbers, headLetter: false);
       if (score > Scores.baseRank) return score;
-
       // 名字未匹配，检查号码时候匹配
       var phoneNumbers = contact?.phoneNumbers;
       var matched =
@@ -215,7 +215,7 @@ class DialItem {
         var hitedNumberIndex = matchedPhoneNumber.number.indexOf(numbers);
         hitedNumber = matchedPhoneNumber.number;
         phoneNumber = hitedNumber;
-        score = Scores.baseRank + 10; // 通讯录优先级？
+        score = Scores.baseRank + Scores.number; // 通讯录优先级？
         var endIndex = hitedNumberIndex + numbers.length;
         for (; hitedNumberIndex < endIndex; hitedNumberIndex++) {
           numberHited.add(hitedNumberIndex);

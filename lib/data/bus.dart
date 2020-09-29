@@ -9,7 +9,6 @@ class DataBus {
 
   static Future<List<Contact>> getDeviceContactsFromDevice({bool first}) async {
     var status = await Permission.contacts.status;
-    // print(status);
     if (status.isUndetermined) {
       // We didn't ask for permission yet.
     }

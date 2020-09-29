@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
@@ -23,13 +24,10 @@ class _ContactPageState extends State<ContactPage> {
   void initState() {
     super.initState();
     var params = this.widget.params;
-    print(params);
     if (params['contact'] != null && params['contact'][0] != null) {
       var contact = jsonDecode(params['contact'][0]);
-      print(contact);
       firstName = contact["firstName"];
       lastName = contact["lastName"];
-      print(contact["phoneNumbers"]);
       phoneNumbers = jsonDecode(contact["phoneNumbers"]);
       phoneNumbers.forEach((element) { 
         element["type"] = element["type"].toString().replaceAll(RegExp(r"(^.*<)|(>.*$)"), "");
@@ -43,12 +41,10 @@ class _ContactPageState extends State<ContactPage> {
         {'number': params['phoneNumber'], 'type': types[0]}
       ];
     }
-    print(phoneNumbers);
   }
 
   @override
   Widget build(BuildContext context) {
-    // print(params);
     var params = (this.widget).params;
     var contact = params["contact"] != null ? params["contact"][0] : null;
     if (contact != null) {

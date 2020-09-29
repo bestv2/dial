@@ -17,8 +17,6 @@ class DbProvider {
     if (!await DbManager.isTableExists(tableName)) {
       await db.execute(tableCreateSql());
     }
-    // print(tableName);
-    // print(dbColumns);
     bool allField = true;
     columns.forEach((column) {
       if (allField)

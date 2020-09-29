@@ -85,7 +85,6 @@ class HomeModel with ChangeNotifier {
     if (result != null) {
       result.forEach((Contact contact) {
         contacts.add(contact);
-        // print('contact bg : ${contact.bg}');
         DialItem dialItem = DialItem.fromContact(contact);
         dialItems.add(dialItem);
       });
@@ -105,20 +104,19 @@ class HomeModel with ChangeNotifier {
         );
       });
     }
-    // print(contacts);
     notifyListeners();
     return contacts;
   }
 
   dial(String phoneNumber) async {
-    // final phoneCall = FlutterPhoneState.startPhoneCall(phoneNumber);
-    // await phoneCall.eventStream.forEach((PhoneCallEvent event) {
-    //   if (event.status == PhoneCallStatus.connecting) {
-    //     addHistory(phoneNumber);
-    //   }
-    // });
-    addHistory(phoneNumber);
-    print("Call is complete");
+    final phoneCall = FlutterPhoneState.startPhoneCall(phoneNumber);
+    await phoneCall.eventStream.forEach((PhoneCallEvent event) {
+      if (event.status == PhoneCallStatus.connecting) {
+        addHistory(phoneNumber);
+      }
+    });
+    // addHistory(phoneNumber);
+    // print("Call is complete");
   }
 
   addHistory(String phoneNumber) {

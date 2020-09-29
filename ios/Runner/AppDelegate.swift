@@ -96,8 +96,6 @@ enum DialFlutterErrorCode {
             let lastName = contact.familyName
             let firstName = contact.givenName
             let identifier = contact.identifier
-//            print("姓名 : \(lastName)\(firstName)")
-            
             //2.获取电话号码
             var numbers : [[String: String?]] = []
             

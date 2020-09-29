@@ -26,15 +26,10 @@ class ContactProvider extends DbProvider {
 
   save(Contact contact) async {
     Database db = await getDatabase();
-    // map.update(columnId, (value) => DateTime.now().millisecondsSinceEpoch);
     var exist = await db
         .rawQuery('select * from $tableName where id = ?', [contact.id]);
-    // print(exist);
-    // print(contact.toMap());
     if (exist == null || exist.isEmpty) {
-      // print(contact.toMap());
       await db.insert(tableName, contact.toMap());
-      // print('saved');
     } else {
       var existContact = exist[0];
       if (existContact["firstName"] != contact.firstName ||

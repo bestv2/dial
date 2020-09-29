@@ -22,7 +22,6 @@ class Contact {
     var defaultNumbers = phoneNumbers.where((element) {
       return element.isDefault;
     });
-    // print(defaultNumbers.isEmpty ? phoneNumbers[0] : defaultNumbers.first);
     return defaultNumbers.isEmpty
         ? (phoneNumbers.isEmpty ? null : phoneNumbers[0])
         : defaultNumbers.first;
@@ -32,7 +31,6 @@ class Contact {
     firstName = json["firstName"].toString();
     lastName = json["lastName"].toString();
     id = json["identifier"];
-    // print(newColor);
     bg = newColor != null && newColor ? AppColor.randomColor().value : json["bg"];
     phoneNumbers = [];
     var phoneNumbersJson = json["phoneNumbers"] is String

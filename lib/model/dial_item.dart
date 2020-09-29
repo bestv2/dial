@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:dial/model/history.dart';
@@ -6,6 +7,15 @@ import 'package:dial/utils/style.dart';
 import 'package:lpinyin/lpinyin.dart';
 
 import 'contact.dart';
+
+class Scores {
+  static final double headLetter = 5;
+  static final double tailLetter = 4;
+  static final double letter = 3;
+  static final double comboWord = 3;
+  static final double comboLetter = 3;
+  static final double baseRank = 0;
+}
 
 class DialItem {
   String phoneNumber;
@@ -45,17 +55,11 @@ class DialItem {
   });
 
   void format() {
-    // bg = AppColor.randomColor();
-    // print(bg);
-    // print(contact);
     if (bg == null && contact != null && contact.bg != null) {
       bg = Color(contact.bg);
     } else if (bg == null) {
       bg = AppColor.randomColor();
     }
-    // print(bg);
-    // log('$bg');
-    var enReg = RegExp(r"[A-Za-z]");
     var cnReg = RegExp(r"[^\x00-\xff]");
     String firstName = contact?.firstName;
     String lastName = contact?.lastName;
@@ -66,14 +70,6 @@ class DialItem {
         name = "${firstName ?? ''} ${lastName ?? ''}";
         if (RegExp(r"^\s*$").hasMatch(name)) name = '';
       }
-      // if (cnReg.hasMatch(firstName)) {
-      //   firstName.replaceAllMapped(
-      //       cnReg, (Match match) => PinyinHelper.getPinyin(match.toString()));
-      // }
-      // if (cnReg.hasMatch(lastName)) {
-      //   lastName.replaceAllMapped(
-      //       cnReg, (Match match) => PinyinHelper.getPinyin(match.toString()));
-      // }
       namePinyinArr.add(firstName);
       namePinyinArr.add(lastName);
       nameArr.add(firstName);
@@ -99,22 +95,20 @@ class DialItem {
     if (shortName == null || shortName.isEmpty) {
       shortName = '-';
     }
-    // print('$name,$bg');
-    // print(namePinyinArr);
   }
 
   bool isSaved() {
     return this.contact != null;
   }
 
-  double rankName(String numbers, {bool combo = true}) {
-    double baseRankScore = 0.0;
+  double rankName(String numbers, {headLetter = false}) {
+    headLetter = headLetter == null ? false : headLetter;
     // 姓名匹配
     int numberIndex = 0;
     int nameIndex = 0;
     int letterIndex = 0;
     int lastNameIndex = -1, lastLetterIndex = -1;
-    bool first = false; // 匹配首字母
+    // bool first = false; // 匹配首字母
 
     // 相邻规则
     // numbers游标递进不相邻算法
@@ -130,16 +124,27 @@ class DialItem {
               numberLetterMap[number].indexOf(letter.toUpperCase()) > -1) {
             // 当前位置匹配
             if (nameHited.indexOf(nameIndex) == -1) {
+              // 单次首次匹配
               nameHited.add(nameIndex);
+              score += Scores.headLetter;
+            } else if (letterIndex == name.length - 1) {
+              // 尾字母
+              score += Scores.tailLetter;
+            } else {
+              // 普通匹配
+              score += Scores.letter;
             }
-            // 每次命中基础增加10分， 同单词同时命中 - 0， 夸词汇 - d,如果跨的是首字 - d / 2
-            score += 10 + (combo ? 2: 1);
-            // 首字母模式直接跳到下个单
-            if (nameHited.length == 2 &&
-                lastLetterIndex == 0 &&
-                letterIndex == 0) {
-              first = true;
+            if (nameIndex == 0) {
+              score += Scores.comboWord;
+            } else if (nameIndex == lastNameIndex + 1) {
+              score += Scores.comboWord;
+            } else if (nameIndex == lastNameIndex &&
+                letterIndex == lastLetterIndex + 1) {
+              score += Scores.comboLetter;
             }
+            // if (this.name == 'xxx') {
+            //   print('$name,$lastLetterIndex,l,$letter,$score');
+            // }
             lastNameIndex = nameIndex;
             lastLetterIndex = letterIndex;
             numberFound = true;
@@ -147,36 +152,24 @@ class DialItem {
         }
         // jump
         // 首字母模式直接跳到下个单词
-        if (letterIndex < name.length - 1 && numberFound && !first) {
+        if (letterIndex < name.length - 1 && numberFound && !headLetter) {
           letterIndex++;
         } else {
-          if (combo && nameHited.isNotEmpty && nameHited.last != nameIndex) {
-            nameIndex = nameHited.first + 1;
-            nameHited = [];
-            score = 0;
-            letterIndex = 0;
-            numberIndex = 0;
-            first = false;
-            numberFound = false;
-          } else {
-            nameIndex++;
-            letterIndex = 0;
-          }
+          nameIndex++;
+          letterIndex = 0;
         }
       }
-      // print("nameIndex:$nameIndex,letterIndex:$letterIndex,numberFound:$numberFound");
       if (!numberFound) {
         // name遍历结束未找到
-        // print("not found ,${numberIndex.toDouble()} $phoneNumbers");
-        score = baseRankScore; // 未找到得分清零
+        score = Scores.baseRank; // 未找到得分清零
         numberHited = [];
         nameHited = [];
         return score;
       }
     }
     // 最终找到
-    score += nameHited.length / nameArr.length * 5;
-    score += baseRankScore;
+    // score += nameHited.length / nameArr.length * 5;
+    score += Scores.baseRank;
     return score;
   }
 
@@ -185,34 +178,36 @@ class DialItem {
     numberHited = [];
     nameHited = [];
     if (numbers == null || numbers.isEmpty) return score;
-    double baseRankScore = 0.0;
 
     if (contact == null) {
+      //  无通讯录，历史号码匹配
       if (phoneNumber != null && phoneNumber.isNotEmpty) {
         var hitedNumberIndex = phoneNumber.indexOf(numbers);
         if (hitedNumberIndex > -1) {
           // 命中
           hitedNumber = phoneNumber;
-          score = baseRankScore;
+          score = Scores.baseRank;
           score += numbers.length / phoneNumber.length * 10;
           var endIndex = hitedNumberIndex + numbers.length;
           for (; hitedNumberIndex < endIndex; hitedNumberIndex++) {
             numberHited.add(hitedNumberIndex);
           }
-          // print(numberHited);
           return score;
         }
       }
     } else {
-      var score1 = rankName(numbers);
-      score1 =
-          score1 > baseRankScore ? score1 : rankName(numbers, combo: false);
-      if (score1 > baseRankScore) return score1;
-      var phoneNumbers = contact?.phoneNumbers;
+      // 有通讯录优先匹配名字
+      // 首字母模式和非首字母模式
+      var headScore = rankName(numbers, headLetter: true);
+      var score = headScore > Scores.baseRank
+          ? headScore
+          : rankName(numbers, headLetter: false);
+      if (score > Scores.baseRank) return score;
 
+      // 名字未匹配，检查号码时候匹配
+      var phoneNumbers = contact?.phoneNumbers;
       var matched =
           phoneNumbers?.any((element) => element.number.indexOf(numbers) > -1);
-
       if (matched) {
         var matchedPhoneNumber = phoneNumbers
             ?.firstWhere((element) => element.number.indexOf(numbers) > -1);
@@ -220,30 +215,15 @@ class DialItem {
         var hitedNumberIndex = matchedPhoneNumber.number.indexOf(numbers);
         hitedNumber = matchedPhoneNumber.number;
         phoneNumber = hitedNumber;
-        score = baseRankScore + 10; // 通讯录优先级？
+        score = Scores.baseRank + 10; // 通讯录优先级？
         var endIndex = hitedNumberIndex + numbers.length;
         for (; hitedNumberIndex < endIndex; hitedNumberIndex++) {
           numberHited.add(hitedNumberIndex);
         }
-        // print(numberHited);
         return score;
       }
     }
-    return baseRankScore;
-  }
-
-  DialItem.fromHistory(History history) {
-    name = '';
-    phoneNumber = history.phoneNumber;
-    time = history.startAt;
-    // print('this.time:${this.time}');
-    if (history.bg != null) bg = Color(history.bg);
-    format();
-  }
-
-  DialItem.fromContact(Contact con) {
-    contact = con;
-    format();
+    return Scores.baseRank;
   }
 
   String getSuspensionTag() {
@@ -257,9 +237,10 @@ class DialItem {
   int compareTo(DialItem right, {bool withScore = false}) {
     DialItem left = this;
     // 分数降序
-    if (withScore!=null && withScore && right.score.compareTo(left.score) != 0)
+    if (withScore != null &&
+        withScore &&
+        right.score.compareTo(left.score) != 0)
       return right.score.compareTo(left.score);
-    // print('$phoneNumber,$withScore ,left.time:${left.time}, right.time:${right.time}');
     if (left.time != null && right.time == null) {
       // 有时间的在前
       return -1;
@@ -279,49 +260,94 @@ class DialItem {
             : getSuspensionTag().compareTo(right.getSuspensionTag()));
   }
 
-  //  compareDialItem(DialItem left, DialItem right, {bool withScore = false}) {
-  //   // 分数降序
-  //   if (withScore && right.score.compareTo(left.score) != 0)
-  //     return right.score.compareTo(left.score);
-  //   if (left.time != null && right.time == null) {
-  //     // 有时间的在前
-  //     return -1;
-  //   } else if (left.time == null && right.time != null) {
-  //     return 1;
-  //   }
-  //   if (left.time != null &&
-  //       right.time != null &&
-  //       left.time.compareTo(right.time) != 0) {
-  //     // 时间降序
-  //     return right.time.compareTo(left.time);
-  //   }
-  //   // 有名字的在前
-  //   if (left.name.isNotEmpty && right.name.isEmpty) {
-  //     return -1;
-  //   } else if (right.name.isNotEmpty && left.name.isEmpty) {
-  //     return 1;
-  //   }
-  //   // 中文在前面
-  //   if (left.name.isNotEmpty &&
-  //       right.name.isNotEmpty &&
-  //       !left.isEn &&
-  //       right.isEn) {
-  //     return -1;
-  //   } else if (left.name.isNotEmpty &&
-  //       right.name.isNotEmpty &&
-  //       left.isEn &&
-  //       !right.isEn) {
-  //     return 1;
-  //   }
-  //   // 姓名升序
-  //   if (left.name.compareTo(right.name) != 0)
-  //     return left.name.compareTo(right.name);
-  //   // 电话升序
-  //   return left.phoneNumber.compareTo(right.phoneNumber);
-  // }
-
   @override
   String toString() {
     return {phoneNumber, name, contact, history}.toString();
   }
+
+  DialItem.fromHistory(History history) {
+    name = '';
+    phoneNumber = history.phoneNumber;
+    time = history.startAt;
+    if (history.bg != null) bg = Color(history.bg);
+    format();
+  }
+
+  DialItem.fromContact(Contact con) {
+    contact = con;
+    format();
+  }
+
+  // double rankNameBak(String numbers, {bool combo = true}) {
+  //   double baseRankScore = 0.0;
+  //   // 姓名匹配
+  //   int numberIndex = 0;
+  //   int nameIndex = 0;
+  //   int letterIndex = 0;
+  //   int lastNameIndex = -1, lastLetterIndex = -1;
+  //   bool first = false; // 匹配首字母
+
+  //   // 相邻规则
+  //   // numbers游标递进不相邻算法
+  //   for (; numberIndex < numbers.length; numberIndex++) {
+  //     String number = numbers[numberIndex];
+  //     bool numberFound = false;
+  //     while (!numberFound && nameIndex < namePinyinArr.length) {
+  //       String name =
+  //           namePinyinArr[nameIndex] != null ? namePinyinArr[nameIndex] : '';
+  //       if (name != null && name.isNotEmpty) {
+  //         String letter = name[letterIndex];
+  //         if (numberLetterMap[number] != null &&
+  //             numberLetterMap[number].indexOf(letter.toUpperCase()) > -1) {
+  //           // 当前位置匹配
+  //           if (nameHited.indexOf(nameIndex) == -1) {
+  //             nameHited.add(nameIndex);
+  //           }
+  //           // 每次命中基础增加10分， 同单词同时命中 - 0， 夸词汇 - d,如果跨的是首字 - d / 2
+  //           score += 10 + (combo ? 2: 1);
+  //           // 首字母模式直接跳到下个单
+  //           if (nameHited.length == 2 &&
+  //               lastLetterIndex == 0 &&
+  //               letterIndex == 0) {
+  //             first = true;
+  //           }
+  //           lastNameIndex = nameIndex;
+  //           lastLetterIndex = letterIndex;
+  //           numberFound = true;
+  //         }
+  //       }
+  //       // jump
+  //       // 首字母模式直接跳到下个单词
+  //       if (letterIndex < name.length - 1 && numberFound && !first) {
+  //         letterIndex++;
+  //       } else {
+  //         if (combo && nameHited.isNotEmpty && nameHited.last != nameIndex) {
+  //           nameIndex = nameHited.first + 1;
+  //           nameHited = [];
+  //           score = 0;
+  //           letterIndex = 0;
+  //           numberIndex = 0;
+  //           first = false;
+  //           numberFound = false;
+  //         } else {
+  //           nameIndex++;
+  //           letterIndex = 0;
+  //         }
+  //       }
+  //     }
+  //     // print("nameIndex:$nameIndex,letterIndex:$letterIndex,numberFound:$numberFound");
+  //     if (!numberFound) {
+  //       // name遍历结束未找到
+  //       // print("not found ,${numberIndex.toDouble()} $phoneNumbers");
+  //       score = baseRankScore; // 未找到得分清零
+  //       numberHited = [];
+  //       nameHited = [];
+  //       return score;
+  //     }
+  //   }
+  //   // 最终找到
+  //   score += nameHited.length / nameArr.length * 5;
+  //   score += baseRankScore;
+  //   return score;
+  // }
 }

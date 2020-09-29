@@ -22,17 +22,6 @@ class DialItems with ChangeNotifier {
   ///
   /// return list[Contact]。
   Future<List> loadContacts() async {
-    // Map<Permission, PermissionStatus> statuses = await [
-    //   Permission.contacts,
-    // ].request();
-    // print(statuses[Permission.contacts]);
-    // var status = await Permission.contacts.status;
-    // print(status);
-    // if (status.isUndetermined) {
-    //   // We didn't ask for permission yet.
-    // }
-    // await Permission.contacts.request().isGranted;
-    // final List result = await _channel.invokeMethod('getContacts');
     final List result = await DataBus.getDeviceContacts();
     if (result != null) {
       result.forEach((element) {

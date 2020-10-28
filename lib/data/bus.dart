@@ -25,15 +25,22 @@ class DataBus {
     return contacts;
   }
 
+  static addContact(Contact contact) async {
+    var json = contact.toJson();
+    // swift 使用identifier
+    json["identifier"] = json["id"];
+    print(json);
+    var res = await _channel.invokeMethod('addContact', json);
+    return res;
+  }
+
   static Future<List<Contact>> getDeviceContacts() async {
     ContactProvider cp = ContactProvider();
     // await cp.drop();
     List<Map> result = await cp.getData();
     // print(result);
     if (result.isNotEmpty) {
-      var res = result
-          .map((element) => Contact.fromJson(element))
-          .toList();
+      var res = result.map((element) => Contact.fromJson(element)).toList();
       // 第二次加载
       getDeviceContactsFromDevice();
       return res;

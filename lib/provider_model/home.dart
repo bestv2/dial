@@ -1,4 +1,5 @@
 import 'package:dial/common/event/index.dart';
+import 'package:dial/common/log/logger.dart';
 import 'package:dial/data/bus.dart';
 import 'package:dial/data/db/history_provider.dart';
 import 'package:dial/model/contact.dart';
@@ -11,6 +12,7 @@ import 'dart:async';
 class HomeModel with ChangeNotifier {
   HomeModel() {
     // getContacts();
+    wLog('model home init');
     loadContacts();
   }
   List<Contact> contacts = <Contact>[];
@@ -81,6 +83,7 @@ class HomeModel with ChangeNotifier {
   ///
   /// return list[Contact]。
   Future<List> loadContacts() async {
+    wLog('lodaContacts');
     final List<Contact> result = await DataBus.getDeviceContacts();
     if (result != null) {
       result.forEach((Contact contact) {
@@ -117,6 +120,10 @@ class HomeModel with ChangeNotifier {
     });
     // addHistory(phoneNumber);
     // print("Call is complete");
+  }
+
+  save(Contact contact) async {
+   return await DataBus.addContact(contact); 
   }
 
   addHistory(String phoneNumber) {

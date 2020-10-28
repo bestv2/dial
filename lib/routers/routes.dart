@@ -2,7 +2,7 @@ import 'package:dial/routers/router_handler.dart';
 import 'package:dial/views/contact.dart';
 import 'package:dial/views/contacts.dart';
 import 'package:flutter/material.dart';
-import 'package:fluro/fluro.dart';
+import 'package:fluro/fluro.dart' as route;
 
 class PageRouteConfig {
   int id;
@@ -57,10 +57,10 @@ class Routes {
         );
   }
 
-  static void configureRoutes(Router router) {
+  static void configureRoutes(route.Router router) {
     router.define(home, handler: homeHandler);
     commons.forEach((config) {
-      router.define(config.routePath, handler: Handler(
+      router.define(config.routePath, handler: route.Handler(
         handlerFunc: config.buildRouter,
       ));
     });

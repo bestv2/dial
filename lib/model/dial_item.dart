@@ -64,7 +64,7 @@ class DialItem {
     var cnReg = RegExp(r"[^\x00-\xff]");
     String firstName = contact?.firstName;
     String lastName = contact?.lastName;
-    phoneNumber = contact?.getDefault()?.number ?? (phoneNumber ?? '无号码');
+    phoneNumber = contact?.getDefault()?.value ?? (phoneNumber ?? null);
     isEn = !cnReg.hasMatch("${firstName ?? ''}${lastName ?? ''}");
     if (isEn) {
       if (contact != null) {
@@ -169,7 +169,8 @@ class DialItem {
       }
     }
     // 最终找到
-    // score += nameHited.length / nameArr.length * 5;
+    // 命中率加成
+    score += nameHited.length / nameArr.length;
     score += Scores.baseRank;
     return score;
   }
@@ -207,13 +208,13 @@ class DialItem {
       // 名字未匹配，检查号码时候匹配
       var phoneNumbers = contact?.phoneNumbers;
       var matched =
-          phoneNumbers?.any((element) => element.number.indexOf(numbers) > -1);
+          phoneNumbers?.any((element) => element.value.indexOf(numbers) > -1);
       if (matched) {
         var matchedPhoneNumber = phoneNumbers
-            ?.firstWhere((element) => element.number.indexOf(numbers) > -1);
+            ?.firstWhere((element) => element.value.indexOf(numbers) > -1);
         // 命中
-        var hitedNumberIndex = matchedPhoneNumber.number.indexOf(numbers);
-        hitedNumber = matchedPhoneNumber.number;
+        var hitedNumberIndex = matchedPhoneNumber.value.indexOf(numbers);
+        hitedNumber = matchedPhoneNumber.value;
         phoneNumber = hitedNumber;
         score = Scores.baseRank + Scores.number; // 通讯录优先级？
         var endIndex = hitedNumberIndex + numbers.length;

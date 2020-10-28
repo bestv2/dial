@@ -4,6 +4,7 @@ import Contacts
 import ContactsUI
 
 
+
 enum ChannelName {
   static let contacts = "dial.flutter.io/contacts"
 }
@@ -27,43 +28,87 @@ enum DialFlutterErrorCode {
                                               binaryMessenger: controller.binaryMessenger)
     contactChannel.setMethodCallHandler({
       [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
-      if call.method == "getContacts"{
-		self?.getContacts(result: result)
-	  } else if call.method == "saveNewContact" {
-		self?.getContacts(result: result)
-	  } else {
-		result(FlutterMethodNotImplemented)
-        return
+      switch call.method {
+		case "getContacts":
+			self?.getContacts(result: result)
+		case "addContact":
+			var contact: CNMutableContact;
+			var dictionary : [String:Any?] = call.args
+			if( dictionary["identifier"] != nil) {
+				do {
+					
+        
+        let store = CNContactStore()
+        var keys = [
+                                  CNContactBirthdayKey,
+                                  CNContactDatesKey,
+                                  CNContactEmailAddressesKey,
+                                  CNContactFamilyNameKey,
+                                  CNContactGivenNameKey,
+                                  CNContactJobTitleKey,
+                                  CNContactMiddleNameKey,
+                                  CNContactNamePrefixKey,
+                                  CNContactNameSuffixKey,
+                                  CNContactThumbnailImageDataKey,
+                                  CNContactOrganizationNameKey,
+                                  CNContactPhoneNumbersKey,
+                                  CNContactPostalAddressesKey,
+                                  CNContactSocialProfilesKey,
+                                  CNContactUrlAddressesKey] as [CNKeyDescriptor]
+
+        
+        // Check if the contact exists
+        var identifier: String = ""
+        if let id = dictionary["identifier"] as? String  {
+			identifier = id
+		}
+
+        if let contact = try store.unifiedContact(withIdentifier: identifier , keysToFetch: keys).mutableCopy() as? CNMutableContact {
+            contact.takeFromDictionary(call.args)
+            print(contact)
+				do {
+					let saved = try self?.updateContact(contact: contact)
+					result(saved?.toDictionary())
+				} catch {
+					result(FlutterError(code: DialFlutterErrorCode.unavailable,
+                          message: "不可用",
+                          details: nil))
+				}
+           
+           
+        } else {
+            throw PluginError.runtimeError(code: "contact.notFound", message: "Couldn't find contact")
+        }
+				} catch {
+				
+				}
+			}else {
+				contact = CNMutableContact()
+				contact.takeFromDictionary(call.args)
+				do {
+					let saved = try self?.addContact(contact: contact)
+					result(saved?.toDictionary())
+				} catch {
+					result(FlutterError(code: DialFlutterErrorCode.unavailable,
+                          message: "不可用",
+                          details: nil))
+				}
+			}
+			
+			
+			
+			
+			
+		default :
+			result(FlutterMethodNotImplemented)
 	  }
+      return
     })
 
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
-  
-  
-//- (void)saveNewContact{
-//    //1.创建Contact对象，必须是可变的
-//    CNMutableContact *contact = [[CNMutableContact alloc] init];
-//    //2.为contact赋值，setValue4Contact中会给出常用值的对应关系
-//    [self setValue4Contact:contact existContect:NO];
-//    //3.创建新建好友页面
-//    CNContactViewController *controller = [CNContactViewController viewControllerForNewContact:contact];
-//    //代理内容根据自己需要实现
-//    controller.delegate = self;
-//    //4.跳转
-//    UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
-//    [self presentViewController:navigation animated:YES completion:^{
-//
-//    }];
-//
-//}
 
-  private func saveNewContact() {
-//	let contact = CNMutableContact.init();
-//	let controller = CNContactViewController.targetViewController(<#T##self: UIViewController##UIViewController#>)
-  }
-  
   private func getContacts(result: FlutterResult) {
     //1.获取授权状态
 	let status = CNContactStore.authorizationStatus(for: .contacts)
@@ -91,23 +136,7 @@ enum DialFlutterErrorCode {
         //需要传入一个CNContactFetchRequest
     do {
         try store.enumerateContacts(with: request, usingBlock: {(contact : CNContact, stop : UnsafeMutablePointer<ObjCBool>) -> Void in
-        
-            //1.获取姓名
-            let lastName = contact.familyName
-            let firstName = contact.givenName
-            let identifier = contact.identifier
-            //2.获取电话号码
-            var numbers : [[String: String?]] = []
-            
-            
-            let phoneNumbers = contact.phoneNumbers
-            for phoneNumber in phoneNumbers
-            {
-				print(phoneNumber.value.stringValue)
-				numbers.append(["label": phoneNumber.label, "value": phoneNumber.value.stringValue])
-            }
-            contacts.append(["identifier": identifier, "firstName": firstName, "lastName": lastName, "phoneNumbers": numbers ]);
-            
+            contacts.append(contact.toDictionary());
         })
     } catch {
         result(FlutterError(code: DialFlutterErrorCode.unavailable,
@@ -116,5 +145,24 @@ enum DialFlutterErrorCode {
         return
 	}
     result(contacts)
+  }
+  
+  @available(iOS 9.0, *)
+  private func addContact(contact : CNMutableContact) throws -> CNMutableContact  {
+      let store = CNContactStore()
+      let saveRequest = CNSaveRequest()
+        
+      saveRequest.add(contact, toContainerWithIdentifier: nil)
+      try store.execute(saveRequest)
+      return contact
+  }
+
+@available(iOS 9.0, *)
+  private func updateContact(contact : CNMutableContact) throws -> CNMutableContact  {
+      let store = CNContactStore()
+      let request = CNSaveRequest()
+      request.update(contact)
+      try store.execute(request)
+      return contact
   }
 }

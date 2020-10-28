@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dial/common/event/index.dart';
+import 'package:dial/common/log/logger.dart';
 import 'package:dial/model/dial_item.dart';
 import 'package:dial/provider_model/home.dart';
 import 'package:dial/routers/application.dart';
@@ -510,14 +511,6 @@ class _DialItemListState extends State<DialItemList> {
                               fontSize: mainFontSize)),
                     );
                   }
-                  // nameW.add(
-                  //   Text(
-                  //     dialItem.score.toString(),
-                  //     // dialItem.time.toString(),
-                  //       style: TextStyle(
-                  //           color: Color(AppColor.mainTextColor),
-                  //           fontSize: mainFontSize)),
-                  // );
                   bool noName = RegExp(r"^\s*$").hasMatch(dialItem.name);
                   double numberSize = noName ? mainFontSize : subFontSize;
                   if (dialItem.numberHited.isNotEmpty) {
@@ -542,7 +535,7 @@ class _DialItemListState extends State<DialItemList> {
                     });
                   } else {
                     numberW.add(
-                      Text(phoneNumber,
+                      Text(phoneNumber ?? '无号码',
                           style: TextStyle(
                               color: Color(AppColor.mainTextColor),
                               fontSize: numberSize)),
@@ -574,6 +567,9 @@ class _DialItemListState extends State<DialItemList> {
                                     dialItem.isSaved() ? '编辑联系人' : '创建联系人'),
                                 onPressed: () {
                                   Navigator.pop(context);
+                                  wLog(
+                                    "/contact?phoneNumber=$phoneNumber${dialItem.isSaved() ? "&contact=${jsonEncode(dialItem.contact)}" : ""}",
+                                  );
                                   Application.router.navigateTo(context,
                                       "/contact?phoneNumber=$phoneNumber${dialItem.isSaved() ? "&contact=${jsonEncode(dialItem.contact)}" : ""}");
                                 },
@@ -598,7 +594,7 @@ class _DialItemListState extends State<DialItemList> {
                     child: Container(
                         // color: Colors.red,
                         padding: EdgeInsets.only(
-                            top: 18, bottom: 18, left: 6, right: 6),
+                            top: 18, bottom: 18, left: 0, right: 0),
                         child: Row(
                           children: <Widget>[
                             Container(

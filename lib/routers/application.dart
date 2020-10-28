@@ -1,4 +1,4 @@
-import 'package:fluro/fluro.dart';
+import 'package:fluro/fluro.dart' as route;
 
 enum ENV {
   PRODUCTION,
@@ -7,5 +7,5 @@ enum ENV {
 
 class Application {
   static ENV env = ENV.DEV;
-  static Router router;
+  static route.Router router;
 }

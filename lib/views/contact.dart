@@ -1,7 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:dial/common/log/logger.dart';
+import 'package:dial/components/toast.dart';
+import 'package:dial/model/contact.dart';
+import 'package:dial/provider_model/home.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ContactPage extends StatefulWidget {
   Map<String, dynamic> params;
@@ -26,21 +31,33 @@ class _ContactPageState extends State<ContactPage> {
     var params = this.widget.params;
     if (params['contact'] != null && params['contact'][0] != null) {
       var contact = jsonDecode(params['contact'][0]);
+      wLog(contact);
+      id = contact["id"];
       firstName = contact["firstName"];
       lastName = contact["lastName"];
       phoneNumbers = jsonDecode(contact["phoneNumbers"]);
-      phoneNumbers.forEach((element) { 
-        element["type"] = element["type"].toString().replaceAll(RegExp(r"(^.*<)|(>.*$)"), "");
-        if(!types.contains(element["type"])) {
-          types.add(element["type"]);
+      phoneNumbers.forEach((element) {
+        element["label"] = element["label"]
+            .toString()
+            .replaceAll(RegExp(r"(^.*<)|(>.*$)"), "");
+        if (!types.contains(element["label"])) {
+          types.add(element["label"]);
         }
-        print(element);
       });
-    } else {
+    }
+    if (phoneNumbers.isEmpty) {
+      wLog('empty');
       phoneNumbers = [
-        {'number': params['phoneNumber'], 'type': types[0]}
+        {
+          'value': (params['phoneNumber'][0] != 'null' &&
+                  params['phoneNumber'][0] != null)
+              ? params['phoneNumber'][0]
+              : '',
+          'label': (types[0] != 'null' && types[0] != null) ? types[0] : ''
+        }
       ];
     }
+    wLog(phoneNumbers);
   }
 
   @override
@@ -62,6 +79,9 @@ class _ContactPageState extends State<ContactPage> {
             ),
             Expanded(
               child: TextField(
+                onChanged: (value) {
+                  lastName = value;
+                },
                 controller: TextEditingController(text: this.lastName),
                 decoration: new InputDecoration(
                   hintText: '姓氏',
@@ -80,6 +100,9 @@ class _ContactPageState extends State<ContactPage> {
           ),
           Expanded(
             child: TextField(
+              onChanged: (value) {
+                firstName = value;
+              },
               controller: TextEditingController(text: this.firstName),
               decoration: new InputDecoration(
                 hintText: '名字',
@@ -101,14 +124,14 @@ class _ContactPageState extends State<ContactPage> {
               margin: EdgeInsets.only(right: 12),
               child: TextField(
                 controller:
-                    TextEditingController(text: phoneNumberMap["number"]),
+                    TextEditingController(text: phoneNumberMap["value"]),
                 decoration: new InputDecoration(
                   hintText: '电话',
                 ),
               ),
             )),
             DropdownButton<String>(
-              value: phoneNumberMap['type'] ?? 'other',
+              value: phoneNumberMap['label'] ?? 'other',
               // icon: Icon(Icons.arrow_downward),
               itemHeight: 65,
               iconSize: 32,
@@ -138,18 +161,30 @@ class _ContactPageState extends State<ContactPage> {
         backgroundColor: Colors.white,
         title: Text('编辑联系人'),
         actions: [
-          InkWell(
-            highlightColor: null,
-            enableFeedback: false,
-            onTap: () {
-              // showDialog(context: context, child: Text('hehe'));
-            },
-            child: Container(
-                padding: EdgeInsets.only(right: 15, left: 15),
-                child: Center(
-                  child: Text('保存'),
-                )),
-          ),
+          Consumer<HomeModel>(builder: (context, homeModel, child) {
+            return InkWell(
+              highlightColor: null,
+              enableFeedback: false,
+              onTap: () async {
+                var phones =
+                    phoneNumbers.map((e) => PhoneNumber.fromJSON(e)).toList();
+                var res = await homeModel.save(Contact(
+                    id: id,
+                    firstName: firstName,
+                    lastName: lastName,
+                    phones: phones));
+                id = res["identifier"];
+                wLog(res);
+                Toast.show('保存成功', context);
+                // showDialog(context: context, child: Text('hehe'));
+              },
+              child: Container(
+                  padding: EdgeInsets.only(right: 15, left: 15),
+                  child: Center(
+                    child: Text('保存'),
+                  )),
+            );
+          }),
         ],
       ),
       body: SafeArea(

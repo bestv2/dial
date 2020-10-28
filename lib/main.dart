@@ -4,7 +4,7 @@ import 'package:dial/provider_model/home.dart';
 import 'package:dial/routers/application.dart';
 import 'package:dial/utils/style.dart';
 import 'package:dial/views/home.dart';
-import 'package:fluro/fluro.dart';
+import 'package:fluro/fluro.dart' as route;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +28,7 @@ void main() {
 
 class DialApp extends StatelessWidget {
   DialApp() {
-    final router = new Router(); 
+    final router = new route.Router(); 
     Routes.configureRoutes(router);
     Application.router = router;
   }
